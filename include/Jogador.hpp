@@ -29,7 +29,6 @@ public:
 	Carta popCard();
 	int getNumCards();
 	int getDinheiro();
-	
 
 };
 
