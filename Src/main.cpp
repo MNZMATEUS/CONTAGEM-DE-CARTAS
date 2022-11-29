@@ -1,44 +1,88 @@
 #include <iostream>
+#include <string>
 #include "Partida.hpp"
 #include "Jogador.hpp"
 
 using namespace std;
 
 void printSeparation(){
-  cout << end1 << end1;
+  cout << endl << endl;
   cout << "-----------------------------------" << endl;
-	cout << "-----------------------------------" << end1;
-  cout << end1 << end1;
+  cout << "-----------------------------------" << endl;
+  cout << endl << endl;
+}
+
+bool is_number(const string& s)
+{
+    return !s.empty() && find_if(s.begin(), 
+        s.end(), [](unsigned char c) { return !isdigit(c); }) == s.end();
 }
 
 
 int main(){
+	
+  string seed;
+	
   string nome;
-  unsigned int buyin;
-  int bet;
+  string blind;
+  string buyIn;	
+	
+  string bet;
   char resposta;
-  bool split;
-  string action = " ";
+  string action;
   bool busted;
-  int seed = 42;
-  
+    
   printSeparation();
   
-   cout << "Insert seed for test" << endl;
-	cin >> seed;
+  do{
+	  try{
+		  cout << "Insert seed for test" << endl;
+		  cin >> seed;
+		  if(!is_number(seed))
+			  throw invalid_argument("Seed is not number");
+	  }
+	  catch(invalid_argument& err){
+		  cerr << "EXCEPTION: " << err.what() << endl << endl;
+	  }
+while(!is_number(seed));
 
-	cout << endl;
-
-	cout << "Insert your name to start" << endl;
+cout << endl;
+	  
+cout << "Insert your name to start" << endl;
 	cin >> nome;
 
 	cout << endl;
-  
-  cout << "Insert buy-in" << end1;
-  cin >> buyin;
-  
-  
-  Partida *p = new Partida(new Jogador(nome, buyin));
+	  
+do{
+		try{
+			cout << "Insert blind" << endl;
+			cin >> blind;
+			if(!is_number(blind))
+				throw invalid_argument("Blind is not number");	
+		}
+		catch(invalid_argument& err){
+			cerr << "EXCEPTION: " << err.what() << endl << endl;
+		}
+	}while(!is_number(blind));
+
+	cout << endl;
+	  
+do{
+	try{
+	  cout << "Insert buy-in" << endl;
+  	  cin >> buyIn;
+  	  if(!is_number(buyIn))
+				throw invalid_argument("BuyIn is not number");
+		}
+		catch(invalid_argument& err){
+			cerr<< "EXCEPTION: "<< err.what() << endl << endl;
+		}
+	}while(!is_number(buyIn));
+	  
+Jogador* jogador = new Jogador(nome, stoi(buyIn));
+	  
+	  
+Partida *p = new Partida(jogador, stoi(seed), stoi(blind));
   
   do{
      p->startNewRound();
@@ -51,27 +95,37 @@ int main(){
       printSeparation();
       
       do{
-        cout << "Augment bet by? (Insert to zero to stand)" << end1;
-        cin >> bet;
-        if(bet<0)
-          cout<< "INVALID VALUE" << end1;
-      }while(bet<0);
+	      try{
+		      cout << "Augment bet by? (Insert to zero to stand)" << endl;
+        	      cin >> bet;
+       		      if(!is_number(bet))
+			      throw invalid_argument("Bet is not number");
+	      }
+	     catch(invalid_argument& err){
+		cerr<< "EXCEPTION: "<< err.what() << endl << endl;
+	     }	
+      }while(!is_number(bet));
       
-      p->bet(bet);
+      p->bet(stoi(bet));
       
-      cout << end1;
+      cout << endl;
       
       do{
-        cout << "Hit or Stand?" << end1;
-        cin >> action;
+	      try{
+		      cout << "Hit or Stand?" << endl;
+        	      cin >> action;
         
-        if(action != "Hit" && action!= "Stand")
-          cout << "INVALID ACTION" << end1;
-        
+        	      if(action != "Hit" && action!= "Stand")
+            	      	throw("INVALID ACTION");
+	 	}
+	      
+	      catch(invalid_argument& err){
+		cerr<< "EXCEPTION: "<< err.what() << endl << endl;
+	      }	            
       }while(action != "Hit" && action!= "Stand");
       
       if(action == "Hit")
-        busted = p->dealCard();
+        busted = p->dealCard(jogador->getName());
       
       if(!busted)
         busted = p->dealerTurn();
@@ -89,23 +143,28 @@ int main(){
     
     if(p->checkCash()){
       do{
-        cout << "Do you wish to play again?(y/n)" << end1;
+	try{
+        cout << "Do you wish to play again?(y/n)" << endl;
         cin >> resposta;
         if(resposta!='y' && resposta!='n')
-          cout<<"INVALID RESPONSE"<<end1;
+          throw<<"INVALID RESPONSE";
+	}
+	catch(invalid_argument& err){
+		cerr<< "EXCEPTION: "<< err.what() << endl << endl;
+	}
       while(resposta!='y' && resposta!='n');
       }
       else{
-        cout<< "Game Over" << end1;
+        cout<< "Game Over" << endl;
         break;
       }
     }while(resposta != 'n');
     
     printSeparation();
 
-  	p->endGame(buyin);
+    p->endGame(buyin);
 
-	  printSeparation();
+    printSeparation();
 
-	  return 0;
-}
+    return 0;
+  }
