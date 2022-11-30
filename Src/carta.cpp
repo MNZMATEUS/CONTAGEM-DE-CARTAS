@@ -62,6 +62,6 @@ void Carta::printCard(){
 			cardName+="Paus";
 			break;
 	}
-	
+
 	cout<< cardName << endl;
 };
